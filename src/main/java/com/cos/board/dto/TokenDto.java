@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class StatusToken {
+public class TokenDto {
 	private boolean validated;
 	private Long restedTime;
 

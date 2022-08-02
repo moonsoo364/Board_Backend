@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -54,15 +56,17 @@ public class User implements UserDetails{
 	
 	
 	
-	@ElementCollection(fetch=FetchType.EAGER)
-	@Builder.Default
-	private List<String> roles =new ArrayList<>();
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private RoleType roles;
 	
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		
-		return this.roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+		User user =new User();
+		Collection<GrantedAuthority> collectors = new ArrayList<>();
+		collectors.add(()->{return "ROLE_"+user.getRoles();});
+		return collectors;
 	}
 
 	@JsonProperty(access =Access.WRITE_ONLY)
