@@ -61,12 +61,11 @@ public class AuthApiController {
 	}
 	
 	
-	
-	@PostMapping("/api/auth/detail")
+	//글 하나 상세보기
+	@PostMapping("/api/auth/boardDetail")
 	public ResponseEntity<BoardDto> selectWriting(@RequestBody Board board,@RequestHeader String Authorization){
-		//selectWriting에서는 토큰에서 username을 가지고 오지 않는다
-		//토큰값이 유효한지 검사하고 예외 발생시 500에러 발생
-
+		//
+		System.out.println(board.getId());
 		try {
 			jwtTokenProvider.vallidateToken(Authorization);
 		}catch (Exception e) {
@@ -110,6 +109,7 @@ public class AuthApiController {
 	@PostMapping("/api/auth/deleteBoard")
 	public ResponseEntity deleteBoard(@RequestBody Board board, @RequestHeader String Authorization)
 	{
+		System.out.println(board);
 		try {
 			jwtTokenProvider.vallidateToken(Authorization);
 		}catch(Exception e) {

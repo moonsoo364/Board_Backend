@@ -87,19 +87,14 @@ public class BoardService {
 		return result;
 	}
 	public BoardDto searchBoardNum(int id, String token) {
-		BoardDto boardDto =new BoardDto();
+		
 		String username = jwtTokenProvider.getUsername(token);
 //		List<Board> result =boardMapper.selectBoard(id);//MyBatis
 		List<Board> repository = boardRepository.findById(id);//JPA
-		
+		//객체지향작성법		
 		Board boardResult =repository.get(0);
-		boardDto.setContent(boardResult.getContent());
-		boardDto.setId(boardResult.getId());
-		boardDto.setTitle(boardResult.getTitle());
-		boardDto.setUsername(boardResult.getUser().getUsername());
-		boardDto.setCorrectUser(boardDto.getUsername().equals(username));
-		 	
-		return boardDto;
+
+		return new BoardDto(boardResult,username);
 	}
 	@Transactional
 	public void updateById(Board board) {
@@ -120,7 +115,7 @@ public class BoardService {
 		}
 	}
 	public ArrayList<BoardDto> selectAllBoard(String username){
-		ArrayList<Board> arrayList =boardRepository.findAll();
+		ArrayList<Board> arrayList =boardRepository.findAllBoard();
 
 		ArrayList<BoardDto> list =new ArrayList<>();
 		

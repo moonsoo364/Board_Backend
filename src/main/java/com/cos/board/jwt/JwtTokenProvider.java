@@ -8,7 +8,7 @@ import java.util.Date;
 
 
 import javax.annotation.PostConstruct;
-
+import javax.persistence.EnumType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,6 +114,24 @@ public class JwtTokenProvider {
 			LOGGER.info("[validateToken] 토큰 유효 체크 예외 발생");
 			return false;
 		}
+	}
+	public boolean isAdmin(String token) {
+		LOGGER.info("[isAdmin] 토큰 유효 체크 시작");
+		try {
+			Jws<Claims>claims =Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+			
+			boolean isUserRole=claims.getBody().get("roles").toString().equals(RoleType.ADMIN.toString());
+			boolean isTimeout = claims.getBody().getExpiration().before(new Date());
+			LOGGER.info("[isAdmin] Admin권한 확인 : {}",isUserRole);
+			LOGGER.info("[isAdmin] 토큰 만료 확인 : {}",isTimeout);
+			boolean result=isUserRole&&!isTimeout;
+			LOGGER.info("[isAdmin] result : {}",result);
+			return result;
+		}catch(Exception e) {
+			LOGGER.info("[isAdmin] 토큰 유효 체크 예외 발생 : {}",e);
+			return false;
+		}
+		
 	}
 	public long restedValiDate(String token) {
 		try {

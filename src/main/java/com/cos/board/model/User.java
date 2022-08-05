@@ -31,7 +31,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity(name="User")
+@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
