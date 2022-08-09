@@ -7,48 +7,56 @@ import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cos.board.config.XssUtil;
 import com.cos.board.dto.BoardDto;
-
+import com.cos.board.dto.SelectBoardDto;
 import com.cos.board.dto.TokenDto;
+import com.cos.board.jwt.JwtInfo;
 import com.cos.board.jwt.JwtTokenProvider;
 import com.cos.board.model.Board;
 import com.cos.board.service.BoardService;
 import com.cos.board.service.UserService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
-public class AuthApiController {
+@RequestMapping("/api")
+@Slf4j
+public class BoardApiController {
 
 	@Autowired
 	private UserService userService;
 	@Autowired
-	private JwtTokenProvider jwtTokenProvider;
+	private JwtInfo jwtInfo;
 	@Autowired
 	private BoardService boardService;
 	
-	@PostMapping("api/auth/expiredCheckToken")
-	public ResponseEntity<TokenDto> checkToken(@RequestHeader String Authorization) {
-	//토큰 유효하면  username 표시
-		TokenDto result= userService.expiredCheckToken(Authorization);
-		
-		if(result.isValidated()) {
-			return new ResponseEntity<TokenDto>(result,HttpStatus.OK);
-		}else {
+	@PostMapping("/board_select")
+	public ResponseEntity<ArrayList<SelectBoardDto>> getBoard() {
+		//게시글 목록
+		try {
+		ArrayList<SelectBoardDto> boardList= boardService.getBoardData();
+			return new ResponseEntity(boardList,HttpStatus.OK);
+		}catch (Exception e){
 			return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+		
+		
 	}
-	@PostMapping("/api/auth/insertBoard")
+
+	@PostMapping("/auth/board_insert")
 	public ResponseEntity insertBoard(@RequestBody BoardDto board,@RequestHeader String Authorization ) {
 		//insertBoard에서는 토큰에서 username 가지고 온다.
-		System.out.println(Authorization);
+		log.info("[insertBoard] 받은 게시물 데이터 : {}",board);
+		log.info("[insertBoard] 받은 유저 토큰 : {}",Authorization);
 		XssUtil xssUtil = new XssUtil();
-		System.out.println(xssUtil.cleanXSS(board.getContent()));
 		board.setContent(xssUtil.cleanXSS(board.getContent()));
 		board.setTitle(xssUtil.cleanXSS(board.getTitle()));
 		if(boardService.insertBoardData(board,Authorization))
@@ -62,56 +70,45 @@ public class AuthApiController {
 	
 	
 	//글 하나 상세보기
-	@PostMapping("/api/auth/boardDetail")
+	@PostMapping("/auth/board_detail")
 	public ResponseEntity<BoardDto> selectWriting(@RequestBody Board board,@RequestHeader String Authorization){
-		//
-		System.out.println(board.getId());
+		log.info("[selectWriting] 게시글 상세보기 조회 시작 게시글 ID:{}",board.getId());
 		try {
-			jwtTokenProvider.vallidateToken(Authorization);
+			jwtInfo.vallidateToken(Authorization);
 		}catch (Exception e) {
 			System.out.println(e);
 			return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 		BoardDto result= boardService.searchBoardNum(board.getId(), Authorization);
-		System.out.println(result);
+		log.info("[selectWriting] body에 전달하는 Data : {}",result);
 		return new ResponseEntity(result,HttpStatus.OK);
 	}
-	@PostMapping("/api/auth/selectAll")
-	public ResponseEntity<ArrayList<BoardDto>> selectAllWriting(@RequestHeader String Authorization) {
-		try {
-			jwtTokenProvider.vallidateToken(Authorization);
-		}catch (Exception e) {
-			System.out.println(e);
-			return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		String username =jwtTokenProvider.getUsername(Authorization);
-		
-		return new ResponseEntity(boardService.selectAllBoard(username),HttpStatus.OK);
-	}
-	@PostMapping("/api/auth/updateBoard")
+	@PostMapping("/auth/board_update")
 	public ResponseEntity updateBoard(@RequestBody Board board, @RequestHeader String Authorization)
 	{
 		try {
-			jwtTokenProvider.vallidateToken(Authorization);
+			jwtInfo.vallidateToken(Authorization);
+			XssUtil xssUtil = new XssUtil();
+			String content=xssUtil.cleanXSS(board.getContent());
+			String title=xssUtil.cleanXSS(board.getTitle());
+			board.setContent(content);
+			board.setTitle(title);
+			log.info("[updateBoard] 게시물 수정 시작 : {}",board);
+			boardService.updateById(board);
+			
+			return new ResponseEntity(HttpStatus.OK);
 		}catch(Exception e) {
 			return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		XssUtil xssUtil = new XssUtil();
-		String content=xssUtil.cleanXSS(board.getContent());
-		String title=xssUtil.cleanXSS(board.getTitle());
-		board.setContent(content);
-		board.setTitle(title);
-		boardService.updateById(board);
 		
-		return new ResponseEntity(HttpStatus.OK);
 	}
-	@PostMapping("/api/auth/deleteBoard")
+	@PostMapping("/auth/board_delete")
 	public ResponseEntity deleteBoard(@RequestBody Board board, @RequestHeader String Authorization)
 	{
-		System.out.println(board);
+		log.info("[deleteBoard] 삭제 요청 시작 : {}",board);
 		try {
-			jwtTokenProvider.vallidateToken(Authorization);
+			jwtInfo.vallidateToken(Authorization);
 		}catch(Exception e) {
 			return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
 		}

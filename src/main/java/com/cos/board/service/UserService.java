@@ -30,6 +30,7 @@ import com.cos.board.dto.BoardDto;
 import com.cos.board.dto.LoginDto;
 import com.cos.board.dto.TokenDto;
 import com.cos.board.dto.UserDto;
+import com.cos.board.jwt.JwtInfo;
 import com.cos.board.jwt.JwtTokenProvider;
 import com.cos.board.mapper.BoardMapper;
 import com.cos.board.model.Board;
@@ -44,10 +45,12 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class UserService {
 	
 	
@@ -60,6 +63,8 @@ public class UserService {
 	
 	@Autowired
 	private JwtTokenProvider jwtTokenProvider;
+	@Autowired
+	private JwtInfo jwtInfo;
 	
 	
 	@PersistenceContext
@@ -120,29 +125,22 @@ public class UserService {
 		
 		List<User> resultList = query.getResultList();
 		
-		
 		try {
-			System.out.println(resultList.get(0));
+			log.info("[checkUser] {}",resultList);
 		}catch(Exception e) {
-			System.out.println("username 없음");
+			log.info("[checkUser] username 없음");
 			loginDto.setUsername(null);
 			loginDto.setCode(2);
-	return loginDto;		
+			return loginDto;		
 		}
 		String encPassword =resultList.get(0).getPassword();
 		String username =resultList.get(0).getUsername();
 		RoleType roles =resultList.get(0).getRoles();
 		boolean isPasswordMathch= encoder().matches(password, encPassword);
-		
+		int id=resultList.get(0).getId();
 		if(isPasswordMathch) {
 			Token token =jwtTokenProvider.createToken(username, roles);
-			loginDto.setUsername(username);
-			loginDto.setCode(0);
-			loginDto.setAdmin(roles==RoleType.ADMIN);
-			loginDto.setExpiredTime(token.getExpiredTime());
-			loginDto.setToken(token.getToken_key());
-			System.out.println("loginDto"+loginDto);
-			return loginDto;
+			return new LoginDto(token.getToken_key(),token.getExpiredTime(),0,roles==RoleType.ADMIN,username,id);
 		}else {
 			System.out.println("password 불일치");
 			loginDto.setUsername(null);
@@ -155,9 +153,10 @@ public class UserService {
 
 	
 	public TokenDto expiredCheckToken(String token) {
+		System.out.println("userService : " +token);
 		TokenDto tokenDto =new TokenDto(false, null);
-		tokenDto.setRestedTime(jwtTokenProvider.restedValiDate(token));
-		tokenDto.setValidated(jwtTokenProvider.vallidateToken(token));
+		tokenDto.setRestedTime(jwtInfo.restedValiDate(token));
+		tokenDto.setValidated(jwtInfo.vallidateToken(token));
 		return tokenDto;
 	}
 	public ArrayList<UserDto> selectAllUser() {
@@ -188,11 +187,11 @@ public class UserService {
 	}
 	public boolean isCorrectPw(String password, int id) {
 		try {
+			log.info("[isCorrectPw] 중복된 비밀번호인지 확인 중..");
 			String encPassword= userRepository.findById(id).get().getPassword();
-			System.out.println("encPassword : "+encoder().matches(password, encPassword));
+			log.info("[isCorrectPw] 비밀번호 일치 유무 : {}",encoder().matches(password, encPassword));
 			return encoder().matches(password, encPassword);
 		} catch (Exception e) {
-			
 			return false;
 		}
 	}

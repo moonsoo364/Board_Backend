@@ -1,6 +1,7 @@
 package com.cos.board.model;
 
 import java.nio.file.attribute.UserPrincipal;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,6 +18,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.Pattern;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
@@ -41,10 +43,9 @@ public class User implements UserDetails{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	@Column(nullable = false, unique = true)
+	@Column(nullable = false, unique = true) 
 	private String username;
 	
-	@JsonProperty(access =Access.WRITE_ONLY)
 	@Column(nullable = false)
 	private String password;
 	

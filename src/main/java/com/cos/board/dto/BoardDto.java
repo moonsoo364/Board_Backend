@@ -8,7 +8,6 @@ import lombok.Data;
 
 @Data
 public class BoardDto {
-	private boolean correctUser;
 	private String title;
 	private String content;
 	private String username;
@@ -24,6 +23,5 @@ public class BoardDto {
 		this.id = boardResult.getId();
 		this.title = boardResult.getTitle();
 		this.username = boardResult.getUser().getUsername();
-		this.correctUser = this.username.equals(userName);
 	}
 }
