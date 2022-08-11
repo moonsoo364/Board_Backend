@@ -55,7 +55,7 @@ public class BoardService {
 
 	
 	@Transactional
-	public boolean insertBoardData(BoardDto board,String token) {
+	public boolean insertBoardData(Board board,String token) {
 		
 
 		try {
@@ -63,9 +63,13 @@ public class BoardService {
 			List<User> result = em.createQuery("select u from User u where u.username= :username",User.class)
 								.setParameter("username", userName).getResultList();
 			
-			int userId=result.get(0).getId();
+			User userId=result.get(0);
+			
 			log.info("[insertBoardData] 유저 id : {}",userId);
-			boardRepository.insertBoard(userId, board.getTitle(), board.getContent());
+			board.setUser(userId);
+			log.info("[insertBoardData] board : {}",board);
+			em.persist(board);
+//			boardRepository.insertBoard(userId, board.getTitle(), board.getContent());
 			return true;
 		}
 		catch(Exception e) {
@@ -94,16 +98,55 @@ public class BoardService {
 		String username = jwtInfo.getUsername(token);
 //		List<Board> result =boardMapper.selectBoard(id);//MyBatis
 		List<Board> repository = boardRepository.findById(id);//JPA
-		//객체지향작성법		
+	
 		Board boardResult =repository.get(0);
-
+		log.info("[searchBoardNum] boardResult : {}",boardResult);
 		return new BoardDto(boardResult,username);
 	}
 	@Transactional
 	public void updateById(Board board) {
 		try {
-		boardMapper.updateBoard(board.getContent(), board.getTitle(), board.getId());
-		log.info("[updateById] 게시물 수정 완료");
+			
+				try {
+				String selectFilenameSQl ="SELECT * FROM board_filename where Board_id="+board.getId();
+				
+				
+				if(!em.createNativeQuery(selectFilenameSQl).getResultList().isEmpty()) {
+					
+					String deleteFilenameSql="DELETE from board_filename where Board_id="+board.getId();
+					em.createNativeQuery(deleteFilenameSql).executeUpdate();
+
+				}else {
+					log.info("[updateByID] 게시물에 등록된 파일이 없습니다.");
+				}
+				}catch(Exception e) {
+					log.info("[updateById] sql에러");
+				}
+				//게시물 수정 Query
+				String updateBoardSql="UPDATE board SET content= :content, "
+						+ "title= :title,"
+						+ "createDate=NOW()"
+						+ "WHERE id="+board.getId();
+
+				int excuteCount=em.createNativeQuery(updateBoardSql)
+									.setParameter("content", board.getContent())
+									.setParameter("title", board.getTitle())
+									.executeUpdate();
+				
+				log.info("[updateById] 게시물 수정 완료 Update 실행 횟수 : {}",excuteCount);
+				//board_filename 테이블 insert
+				board.getFilename().forEach(index->{
+					String insertQuery="INSERT INTO board_filename (Board_id,filename) values(?1,?2)";
+					em.createNativeQuery(insertQuery)
+					.setParameter(1, board.getId())
+					.setParameter(2, index)
+					.executeUpdate();
+					
+				});
+				
+				
+				
+			
 		}catch(Exception e) {
 			System.out.println(e);
 		}

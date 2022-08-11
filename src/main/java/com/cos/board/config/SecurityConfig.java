@@ -4,6 +4,7 @@ package com.cos.board.config;
 import org.springframework.beans.factory.annotation.Autowired;
 
 
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -16,9 +17,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 
-import com.cos.board.jwt.CustomAuthenticationEntryPoint;
 import com.cos.board.jwt.JwtTokenProvider;
-import com.cos.board.jwt.MyFilter;
+
 
 
 

@@ -153,7 +153,6 @@ public class UserService {
 
 	
 	public TokenDto expiredCheckToken(String token) {
-		System.out.println("userService : " +token);
 		TokenDto tokenDto =new TokenDto(false, null);
 		tokenDto.setRestedTime(jwtInfo.restedValiDate(token));
 		tokenDto.setValidated(jwtInfo.vallidateToken(token));

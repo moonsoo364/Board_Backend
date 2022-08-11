@@ -39,7 +39,7 @@ public class JwtTokenProvider {
 	
 	@Value("${springboot.jwt.secret}")
 	private String secretKey ="secretKey";
-	private final int tokenValidMillisecond = 1000*60*60;
+	private final int tokenValidMillisecond = 1000*60*180;
 	
 	//Bean 속성 초기화 이후에 @PostConstruct 주석이 달린 메서드를 한 번만 호출한다.
 	@PostConstruct

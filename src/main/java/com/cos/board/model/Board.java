@@ -1,8 +1,11 @@
 package com.cos.board.model;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -25,15 +28,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table
-@Entity(name="Board")
+@Entity
 public class Board {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	@Column
+	@Lob
 	private String content;
+	// BLOB : 64KB,
+	// MEDIUMBLOB: 16MB,
+	// LONGBLOB: 4GB
+	@ElementCollection(fetch=FetchType.EAGER)
+	private List<String> filename =new ArrayList<>();
 	
 	@Column
 	private String title;
@@ -41,6 +49,7 @@ public class Board {
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="userid")
 	private User user;
+
 	
 	@Column(name="createDate", nullable=true, updatable=true,
 			insertable=true, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")

@@ -1,6 +1,8 @@
 package com.cos.board.dto;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.cos.board.model.Board;
 
@@ -12,6 +14,7 @@ public class BoardDto {
 	private String content;
 	private String username;
 	private Timestamp createTime;
+	private List<String> filename =new ArrayList<>();
 	private int id;
 	
 	public BoardDto() {
@@ -23,5 +26,6 @@ public class BoardDto {
 		this.id = boardResult.getId();
 		this.title = boardResult.getTitle();
 		this.username = boardResult.getUser().getUsername();
+		this.filename=boardResult.getFilename();
 	}
 }

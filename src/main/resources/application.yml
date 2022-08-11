@@ -27,7 +27,11 @@ spring:
 springboot:
  jwt:
   secret: "ms1234"
-
+ servlet:
+  multipart:
+   max-file-size: 10MB
+   max-request-size: 10MB
+   dir: "C:/files/"
  
   
 
