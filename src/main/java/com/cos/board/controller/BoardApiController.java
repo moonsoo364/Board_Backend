@@ -44,6 +44,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.cos.board.config.XssUtil;
 import com.cos.board.dto.BoardDto;
+import com.cos.board.dto.DownloadFileDto;
 import com.cos.board.dto.SelectBoardDto;
 import com.cos.board.dto.TokenDto;
 import com.cos.board.jwt.JwtInfo;
@@ -154,28 +155,17 @@ public class BoardApiController {
 	@PostMapping("/auth/file_submit")
 	public ResponseEntity<Boolean> getFiles (@RequestParam("fileList") List<MultipartFile> fileList, @RequestHeader String Authorization)
 	{
-		log.info("[getFiles] 파일 받음");
+		
+			log.info("[getFiles] 파일 받음 {}",fileList);
 			if(jwtInfo.vallidateToken(Authorization)) {
-				
-				try {
-					for (MultipartFile multipartFile :fileList) {
-						FileOutputStream writer = new FileOutputStream(env.getProperty("springboot.servlet.multipart.dir")+multipartFile.getOriginalFilename());
-						log.info("[getFiles] filename : {}",multipartFile.getOriginalFilename());
-						writer.write(multipartFile.getBytes());
-						writer.close();
-						return new ResponseEntity(true,HttpStatus.OK);
-					}
-				} catch (Exception e) {
-					log.info("[getFiles] 파일 용량 초과!");
-					return new ResponseEntity(false,HttpStatus.INTERNAL_SERVER_ERROR);
-				}
-				
-			
+				boardService.fileUploadInlocal(fileList);
+				log.info("[getFiles] 모든 파일이 업로드 되었습니다!");
+				return new ResponseEntity(true,HttpStatus.OK);
 				
 			}
-
+			else {
 			return new ResponseEntity(false,HttpStatus.UNAUTHORIZED);
-			
+			}
 		
 	}
 	@PostMapping("/auth/download")
@@ -184,25 +174,20 @@ public class BoardApiController {
 		log.info("[pushFile] 파일 이름: {} , token: {}",filename,Authorization);
 		
 		if(jwtInfo.vallidateToken(Authorization)) {
-			String path= env.getProperty("springboot.servlet.multipart.dir")+filename;
-
-			File file =new File(path);
-			log.info("[pushFIle] dir : {} ",file.getName());
+			
 			HttpHeaders headers =new HttpHeaders();
-			headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename="+filename);
+			//브라우저에서 해당 파일을 캐싱하지 않기 위한 header설정
 			headers.add("Cache-Control","no-cache, no-store, must-revalidate");
 			headers.add("Pragma", "no-cache");
 			headers.add("Expires", "0");
+			DownloadFileDto resource =boardService.fileDownloadInBrowser(filename);
 			
-			InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
-			log.info("[pushFile] 파일 다운로드 시작");
 			return ResponseEntity.ok()
 					.headers(headers)
-					.contentLength(file.length())
+					.contentLength(resource.getFileSize())
 					.contentType(MediaType.parseMediaType("application/octet-stream"))
-					.body(resource);
+					.body(resource.getFile());
 			
-		
 		}
 		log.info("[pushFile] 유효하지 않은 토큰");
 		return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);

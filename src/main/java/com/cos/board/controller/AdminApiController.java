@@ -32,7 +32,7 @@ import com.cos.board.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000/")
+//@CrossOrigin(origins = "http://localhost:3000/") cors 단독설정
 @RequestMapping(value="/api/admin")
 @Slf4j
 public class AdminApiController {
