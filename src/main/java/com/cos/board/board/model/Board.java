@@ -1,4 +1,4 @@
-package com.cos.board.model;
+package com.cos.board.board.model;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -17,6 +17,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
+
+import com.cos.board.user.model.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

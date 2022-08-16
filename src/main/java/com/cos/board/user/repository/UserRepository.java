@@ -1,4 +1,4 @@
-package com.cos.board.repository;
+package com.cos.board.user.repository;
 
 import java.util.ArrayList;
 
@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.cos.board.model.User;
+import com.cos.board.user.model.User;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
 	

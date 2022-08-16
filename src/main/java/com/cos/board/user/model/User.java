@@ -1,4 +1,4 @@
-package com.cos.board.model;
+package com.cos.board.user.model;
 
 import java.nio.file.attribute.UserPrincipal;
 

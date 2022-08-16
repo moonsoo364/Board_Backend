@@ -1,4 +1,4 @@
-package com.cos.board.mapper;
+package com.cos.board.board.mapper;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import com.cos.board.model.Board;
+import com.cos.board.board.model.Board;
 
 @Mapper
 public interface BoardMapper {

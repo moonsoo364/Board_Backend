@@ -1,4 +1,4 @@
-package com.cos.board.repository;
+package com.cos.board.board.repository;
 
 import java.util.ArrayList;
 
@@ -16,8 +16,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.cos.board.dto.BoardDto;
-import com.cos.board.model.Board;
+import com.cos.board.board.dto.BoardDto;
+import com.cos.board.board.model.Board;
 
 public interface BoardRepository extends JpaRepository<Board, Integer>{
 

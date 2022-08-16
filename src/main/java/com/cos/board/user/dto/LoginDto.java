@@ -1,4 +1,4 @@
-package com.cos.board.dto;
+package com.cos.board.user.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

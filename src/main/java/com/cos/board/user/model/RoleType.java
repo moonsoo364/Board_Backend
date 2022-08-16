@@ -1,4 +1,4 @@
-package com.cos.board.model;
+package com.cos.board.user.model;
 
 public enum RoleType {
 USER,ADMIN

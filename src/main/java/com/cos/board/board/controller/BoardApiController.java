@@ -1,8 +1,9 @@
-package com.cos.board.controller;
+package com.cos.board.board.controller;
 
 
 
 import java.io.BufferedInputStream;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -34,7 +35,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,16 +46,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.cos.board.board.dto.BoardDto;
+import com.cos.board.board.dto.DownloadFileDto;
+import com.cos.board.board.dto.SelectBoardDto;
+import com.cos.board.board.model.Board;
+import com.cos.board.board.service.BoardService;
 import com.cos.board.config.XssUtil;
-import com.cos.board.dto.BoardDto;
-import com.cos.board.dto.DownloadFileDto;
-import com.cos.board.dto.SelectBoardDto;
-import com.cos.board.dto.TokenDto;
 import com.cos.board.jwt.JwtInfo;
-import com.cos.board.jwt.JwtTokenProvider;
-import com.cos.board.model.Board;
-import com.cos.board.service.BoardService;
-import com.cos.board.service.UserService;
+import com.cos.board.jwt.dto.TokenDto;
+import com.cos.board.user.service.UserService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -69,7 +72,7 @@ public class BoardApiController {
 	@Autowired
 	private Environment env;
 	
-	@PostMapping("/board_select")
+	@GetMapping("/board_select")
 	public ResponseEntity<ArrayList<SelectBoardDto>> getBoard() {
 		//게시글 목록
 		try {
@@ -106,9 +109,9 @@ public class BoardApiController {
 	
 	
 	//글 하나 상세보기
-	@PostMapping("/auth/board_detail")
-	public ResponseEntity<BoardDto> selectWriting(@RequestBody Board board,@RequestHeader String Authorization){
-		log.info("[selectWriting] 게시글 상세보기 조회 시작 게시글 ID:{}",board.getId());
+	@GetMapping("/auth/board_detail")
+	public ResponseEntity<BoardDto> selectWriting(@RequestHeader String Authorization, @RequestParam("id") int id){
+		log.info("[selectWriting] 게시글 상세보기 조회 시작 게시글 ID:{}",id);
 		try {
 			jwtInfo.vallidateToken(Authorization);
 		}catch (Exception e) {
@@ -116,11 +119,11 @@ public class BoardApiController {
 			return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
-		BoardDto result= boardService.searchBoardNum(board.getId(), Authorization);
+		BoardDto result= boardService.searchBoardNum(id, Authorization);
 		log.info("[selectWriting] body에 전달하는 Data : {}",result);
 		return new ResponseEntity(result,HttpStatus.OK);
 	}
-	@PostMapping("/auth/board_update")
+	@PutMapping("/auth/board_update")
 	public ResponseEntity updateBoard(@RequestBody Board board, @RequestHeader String Authorization)
 	{
 		try {
@@ -139,16 +142,16 @@ public class BoardApiController {
 		}
 		
 	}
-	@PostMapping("/auth/board_delete")
-	public ResponseEntity deleteBoard(@RequestBody Board board, @RequestHeader String Authorization)
+	@DeleteMapping("/auth/board_delete")
+	public ResponseEntity deleteBoard(@RequestParam("id") int id, @RequestHeader String Authorization)
 	{
-		log.info("[deleteBoard] 삭제 요청 시작 : {}",board);
+		log.info("[deleteBoard] 삭제 요청 시작 : {}",id);
 		try {
 			jwtInfo.vallidateToken(Authorization);
 		}catch(Exception e) {
 			return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		boardService.deleteById(board);
+		boardService.deleteById(id);
 		
 		return new ResponseEntity(HttpStatus.OK);
 	}

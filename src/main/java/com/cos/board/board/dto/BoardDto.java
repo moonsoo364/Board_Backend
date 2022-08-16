@@ -1,10 +1,10 @@
-package com.cos.board.dto;
+package com.cos.board.board.dto;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.cos.board.model.Board;
+import com.cos.board.board.model.Board;
 
 import lombok.Data;
 
@@ -18,6 +18,15 @@ public class BoardDto {
 	private int id;
 	
 	public BoardDto() {
+		
+	}
+	
+	public BoardDto(Board board) {
+		this.title = board.getTitle();
+		this.content = board.getContent();
+		this.username = board.getUser().getUsername();
+		this.createTime = board.getCreateDate();
+		this.id = board.getId();
 		
 	}
 	

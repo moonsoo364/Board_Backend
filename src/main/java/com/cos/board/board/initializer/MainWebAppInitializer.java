@@ -1,4 +1,4 @@
-package com.cos.board.initializer;
+package com.cos.board.board.initializer;
 
 import javax.servlet.MultipartConfigElement;
 

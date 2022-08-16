@@ -17,9 +17,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
-import com.cos.board.model.RoleType;
-import com.cos.board.model.Token;
-
+import com.cos.board.jwt.dto.Token;
+import com.cos.board.user.model.RoleType;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;

@@ -1,4 +1,4 @@
-package com.cos.board.service;
+package com.cos.board.board.service;
 
 
 import java.io.File;
@@ -26,19 +26,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.cos.board.dto.BoardDto;
-import com.cos.board.dto.DownloadFileDto;
-import com.cos.board.dto.SelectBoardDto;
-import com.cos.board.dto.TokenDto;
+import com.cos.board.board.dto.BoardDto;
+import com.cos.board.board.dto.DownloadFileDto;
+import com.cos.board.board.dto.SelectBoardDto;
+import com.cos.board.board.mapper.BoardMapper;
+import com.cos.board.board.model.Board;
+import com.cos.board.board.repository.BoardRepository;
 import com.cos.board.jwt.JwtInfo;
 import com.cos.board.jwt.JwtTokenProvider;
-import com.cos.board.mapper.BoardMapper;
-import com.cos.board.model.Board;
-import com.cos.board.model.Token;
-import com.cos.board.model.User;
-
-import com.cos.board.repository.BoardRepository;
-import com.cos.board.repository.UserRepository;
+import com.cos.board.jwt.dto.Token;
+import com.cos.board.jwt.dto.TokenDto;
+import com.cos.board.user.model.User;
+import com.cos.board.user.repository.UserRepository;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -163,10 +162,11 @@ public class BoardService {
 		}
 	}
 	@Transactional
-	public void deleteById(Board board) {
-		log.info("[deleteById] BoardId값으로 삭제중...");
+	public void deleteById(int id) {
+		log.info("[deleteById] BoardId값으로 삭제시작");
 		try {
-		boardMapper.deleteBoard(board.getId());
+		boardMapper.deleteBoard(id);
+		log.info("[deleteById] BoardId값으로 삭제완료");
 		}catch(Exception e) {
 			System.out.println(e);
 		}

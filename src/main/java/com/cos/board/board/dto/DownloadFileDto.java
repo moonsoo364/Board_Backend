@@ -1,4 +1,4 @@
-package com.cos.board.dto;
+package com.cos.board.board.dto;
 
 import org.springframework.core.io.InputStreamResource;
 

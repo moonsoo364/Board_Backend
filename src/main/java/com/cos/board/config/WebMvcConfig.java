@@ -15,6 +15,29 @@ public class WebMvcConfig implements WebMvcConfigurer{
 		
 		 registry.addMapping("/api/**")
 		 .allowedOrigins("http://localhost:3000")
-		 .allowedMethods("GET","POST");
+		 .allowedMethods("GET","POST","PUT","DELETE");
+		 
+//		 restful api
+//		 
+//		 rule : 
+//			 
+//			 crud : create, read, update, delete
+//			 method : POST
+//			 
+//			 
+//			 /api/board/insert : create
+//			 /api/board/select : read
+//			 /api/board/update : update
+//			 /api/board/delete : delete
+//			 
+//			 
+//			 Method :
+//				 GET, POST, DELETE, PUT
+//				 
+//				 GET : /api/board/{id}
+//				 POST : /api/board
+//				 DELTE : /api/board
+//				 PUT : /api/board
+				 
 	 }
 }

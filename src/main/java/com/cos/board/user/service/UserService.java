@@ -1,8 +1,10 @@
-package com.cos.board.service;
+package com.cos.board.user.service;
+
 
 
 
 import java.util.ArrayList;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -26,20 +28,19 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.cos.board.dto.BoardDto;
-import com.cos.board.dto.LoginDto;
-import com.cos.board.dto.TokenDto;
-import com.cos.board.dto.UserDto;
+import com.cos.board.board.dto.BoardDto;
+import com.cos.board.board.mapper.BoardMapper;
+import com.cos.board.board.model.Board;
+import com.cos.board.board.repository.BoardRepository;
 import com.cos.board.jwt.JwtInfo;
 import com.cos.board.jwt.JwtTokenProvider;
-import com.cos.board.mapper.BoardMapper;
-import com.cos.board.model.Board;
-import com.cos.board.model.RoleType;
-import com.cos.board.model.Token;
-import com.cos.board.model.User;
-
-import com.cos.board.repository.BoardRepository;
-import com.cos.board.repository.UserRepository;
+import com.cos.board.jwt.dto.Token;
+import com.cos.board.jwt.dto.TokenDto;
+import com.cos.board.user.dto.LoginDto;
+import com.cos.board.user.dto.UserDto;
+import com.cos.board.user.model.RoleType;
+import com.cos.board.user.model.User;
+import com.cos.board.user.repository.UserRepository;
 
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -115,13 +116,13 @@ public class UserService {
 		return result;
 	}
 	
-	public LoginDto checkUser(User user,String password) {
+	public LoginDto checkUser(String username,String password) {
 		
 
 		LoginDto loginDto =new LoginDto();
 		
 		Query query =em.createQuery("select u from User u where u.username = ?1");
-		query.setParameter(1, user.getUsername());
+		query.setParameter(1, username);
 		
 		List<User> resultList = query.getResultList();
 		
@@ -134,15 +135,16 @@ public class UserService {
 			return loginDto;		
 		}
 		String encPassword =resultList.get(0).getPassword();
-		String username =resultList.get(0).getUsername();
+		String name =resultList.get(0).getUsername();
 		RoleType roles =resultList.get(0).getRoles();
 		boolean isPasswordMathch= encoder().matches(password, encPassword);
 		int id=resultList.get(0).getId();
 		if(isPasswordMathch) {
+			log.info("[checkUser] 로그인 성공");
 			Token token =jwtTokenProvider.createToken(username, roles);
-			return new LoginDto(token.getToken_key(),token.getExpiredTime(),0,roles==RoleType.ADMIN,username,id);
+			return new LoginDto(token.getToken_key(),token.getExpiredTime(),0,roles==RoleType.ADMIN,name,id);
 		}else {
-			System.out.println("password 불일치");
+			log.info("[checkUser] password불일치");
 			loginDto.setUsername(null);
 			loginDto.setCode(1);
 			return loginDto;
@@ -151,86 +153,12 @@ public class UserService {
 		
 	}
 
-	
 	public TokenDto expiredCheckToken(String token) {
 		TokenDto tokenDto =new TokenDto(false, null);
 		tokenDto.setRestedTime(jwtInfo.restedValiDate(token));
 		tokenDto.setValidated(jwtInfo.vallidateToken(token));
 		return tokenDto;
 	}
-	public ArrayList<UserDto> selectAllUser() {
-		ArrayList<User> arrayList= new ArrayList<>();
-		ArrayList<User> arr= userRepository.selectAllUser();
-		ArrayList<UserDto> userList =new ArrayList<>();
-		
-		
-		try {
-			for(User index:arr) {
-				UserDto userDto =new UserDto();
-				userDto.setId(index.getId());
-				userDto.setUsername(index.getUsername());
-				userDto.setCreateDate(index.getCreateDate());
-				userDto.setEmail(index.getEmail());
-				userDto.setRoles(index.getRoles().toString());
-				userList.add(userDto);
-			}
-			return userList;
-			
-		} catch (Exception e) {
-			// TODO: handle exception
-			System.err.println("SQL Error");
-			return null;
-		}
-			
-		
-	}
-	public boolean isCorrectPw(String password, int id) {
-		try {
-			log.info("[isCorrectPw] 중복된 비밀번호인지 확인 중..");
-			String encPassword= userRepository.findById(id).get().getPassword();
-			log.info("[isCorrectPw] 비밀번호 일치 유무 : {}",encoder().matches(password, encPassword));
-			return encoder().matches(password, encPassword);
-		} catch (Exception e) {
-			return false;
-		}
-	}
 	
-	@Transactional
-	public void updateUser(int id, String email, String password) {
-		String encPassword =encoder().encode(password);
-		try {
-			userRepository.UpdateById(email, encPassword,id);
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-		
-	}
-	public List<BoardDto> selectUserWriting (int userId){
-		try {
-			
-			List<Board>writingList= boardRepository.findByUserId(userId);
-			Stream<Board> stream =writingList.stream();
-			List<BoardDto> result = new ArrayList<>();
-			stream.forEach(board->{
-				BoardDto boardDto =new BoardDto();
-				boardDto.setId(board.getId());
-				boardDto.setContent(board.getContent());
-				boardDto.setTitle(board.getTitle());
-				boardDto.setCreateTime(board.getCreateDate());
-				boardDto.setUsername(board.getUser().getUsername());
-				result.add(boardDto);
-				});
-			System.out.println(result);
-			return result;
-		} catch (Exception e) {
-			System.out.println(e);
-			return null;
-		}
-		
-		
-		
-	}
-	
-
 	
 }

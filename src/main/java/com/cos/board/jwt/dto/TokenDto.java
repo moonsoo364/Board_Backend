@@ -1,4 +1,4 @@
-package com.cos.board.dto;
+package com.cos.board.jwt.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
