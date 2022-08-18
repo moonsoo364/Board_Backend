@@ -33,20 +33,20 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Board {
 	
+	// BLOB : 64KB,
+	// MEDIUMBLOB: 16MB,
+	// LONGBLOB: 4GB
+	
+	
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
 	@Lob
 	private String content;
-	// BLOB : 64KB,
-	// MEDIUMBLOB: 16MB,
-	// LONGBLOB: 4GB
-	@ElementCollection(fetch=FetchType.EAGER)
-	private List<String> filename =new ArrayList<>();
 	
 	@Column
 	private String title;
+	
 	
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="userid")
@@ -57,4 +57,10 @@ public class Board {
 			insertable=true, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
 	private Timestamp createDate;
 
+	public Board(int id,String content, String title, User user){
+		this.id =id;
+		this.content=content;
+		this.title=title;
+		this.user=user;
+	}
 }

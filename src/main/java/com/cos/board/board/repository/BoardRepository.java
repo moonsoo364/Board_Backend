@@ -3,20 +3,19 @@ package com.cos.board.board.repository;
 import java.util.ArrayList;
 
 
-import java.util.List;
-import java.util.Optional;
 
-import javax.validation.constraints.Pattern;
+import java.util.List;
+
+
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.cos.board.board.dto.BoardDto;
+import org.springframework.data.repository.query.Param;
+
+
+
 import com.cos.board.board.model.Board;
 
 public interface BoardRepository extends JpaRepository<Board, Integer>{
@@ -36,4 +35,6 @@ public interface BoardRepository extends JpaRepository<Board, Integer>{
 	public ArrayList<Board> findAllBoard();
 	
 	public List<Board> findByUserId(int userId);
+	public List<Board> findAllByOrderByIdDesc();
+	
 }

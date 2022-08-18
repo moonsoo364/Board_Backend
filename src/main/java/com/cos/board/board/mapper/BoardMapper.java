@@ -20,7 +20,11 @@ public interface BoardMapper {
 	@Update("UPDATE BOARD SET CONTENT=#{content}, TITLE=#{title}, CREATEDATE=NOW() WHERE ID =#{id}")
 	@Options(useGeneratedKeys =true, keyProperty="id")
 	void updateBoard(@Param("content")String content,@Param("title")String title,@Param("id") int id);
-	@Delete("DELETE FROM BOARD WHERE ID= #{id}")
+	
+	@Delete("DELETE FROM board WHERE ID= #{id}")
 	@Options(useGeneratedKeys = true, keyProperty = "id")
 	void deleteBoard(@Param("id")int id);
+	
+	@Update("UPDATE BOARD SET ID =@COUNT:=@COUNT+1")
+	void updateId();
 }
